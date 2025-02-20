@@ -1,0 +1,198 @@
+// easy problem
+
+import java.util.ArrayList;
+import java.util.Scanner;
+
+class Employee {
+    int id;
+    String name;
+    double salary;
+
+    Employee(int id, String name, double salary) {
+        this.id = id;
+        this.name = name;
+        this.salary = salary;
+    }
+
+    @Override
+    public String toString() {
+        return "ID: " + id + ", Name: " + name + ", Salary: " + salary;
+    }
+}
+
+public class EmployeeManagement {
+    public static void main(String[] args) {
+        ArrayList<Employee> employees = new ArrayList<>();
+        Scanner scanner = new Scanner(System.in);
+        int choice;
+
+        do {
+            System.out.println("\n1. Add Employee\n2. Update Employee\n3. Remove Employee\n4. Search Employee\n5. Display All\n6. Exit");
+            System.out.print("Enter choice: ");
+            choice = scanner.nextInt();
+            
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter ID: ");
+                    int id = scanner.nextInt();
+                    scanner.nextLine();
+                    System.out.print("Enter Name: ");
+                    String name = scanner.nextLine();
+                    System.out.print("Enter Salary: ");
+                    double salary = scanner.nextDouble();
+                    employees.add(new Employee(id, name, salary));
+                    break;
+                    
+                case 2:
+                    System.out.print("Enter Employee ID to update: ");
+                    int updateId = scanner.nextInt();
+                    for (Employee emp : employees) {
+                        if (emp.id == updateId) {
+                            scanner.nextLine();
+                            System.out.print("Enter New Name: ");
+                            emp.name = scanner.nextLine();
+                            System.out.print("Enter New Salary: ");
+                            emp.salary = scanner.nextDouble();
+                            System.out.println("Employee Updated!");
+                        }
+                    }
+                    break;
+                    
+                case 3:
+                    System.out.print("Enter Employee ID to remove: ");
+                    int removeId = scanner.nextInt();
+                    employees.removeIf(emp -> emp.id == removeId);
+                    System.out.println("Employee Removed!");
+                    break;
+                    
+                case 4:
+                    System.out.print("Enter Employee ID to search: ");
+                    int searchId = scanner.nextInt();
+                    for (Employee emp : employees) {
+                        if (emp.id == searchId) {
+                            System.out.println(emp);
+                        }
+                    }
+                    break;
+                    
+                case 5:
+                    for (Employee emp : employees) {
+                        System.out.println(emp);
+                    }
+                    break;
+                    
+                case 6:
+                    System.out.println("Exiting...");
+                    break;
+                    
+                default:
+                    System.out.println("Invalid Choice!");
+            }
+        } while (choice != 6);
+
+        scanner.close();
+    }
+}
+
+
+//medium problem
+
+import java.util.*;
+
+public class CardCollection {
+    public static void main(String[] args) {
+        Map<String, List<String>> cards = new HashMap<>();
+        Scanner scanner = new Scanner(System.in);
+        int choice;
+
+        do {
+            System.out.println("\n1. Add Card\n2. Display Cards\n3. Find Cards by Symbol\n4. Exit");
+            System.out.print("Enter choice: ");
+            choice = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter Symbol (Hearts, Diamonds, etc.): ");
+                    String symbol = scanner.nextLine();
+                    System.out.print("Enter Card Value (Ace, King, 10, etc.): ");
+                    String value = scanner.nextLine();
+                    
+                    cards.putIfAbsent(symbol, new ArrayList<>());
+                    cards.get(symbol).add(value);
+                    break;
+                    
+                case 2:
+                    for (var entry : cards.entrySet()) {
+                        System.out.println(entry.getKey() + ": " + entry.getValue());
+                    }
+                    break;
+                    
+                case 3:
+                    System.out.print("Enter Symbol to search: ");
+                    String searchSymbol = scanner.nextLine();
+                    System.out.println(cards.getOrDefault(searchSymbol, Collections.emptyList()));
+                    break;
+                    
+                case 4:
+                    System.out.println("Exiting...");
+                    break;
+                    
+                default:
+                    System.out.println("Invalid Choice!");
+            }
+        } while (choice != 4);
+
+        scanner.close();
+    }
+}
+
+
+//hard using multithreading
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+class TicketBooking implements Runnable {
+    private static int availableSeats = 10;
+    private static final Lock lock = new ReentrantLock();
+    private String passengerName;
+    private int priority;
+
+    TicketBooking(String passengerName, int priority) {
+        this.passengerName = passengerName;
+        this.priority = priority;
+    }
+
+    @Override
+    public void run() {
+        try {
+            lock.lock();
+            if (availableSeats > 0) {
+                System.out.println(passengerName + " booked a seat. Remaining seats: " + (--availableSeats));
+            } else {
+                System.out.println(passengerName + " could not book a seat. No seats available.");
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+}
+
+public class TicketBookingSystem {
+    public static void main(String[] args) {
+        Thread t1 = new Thread(new TicketBooking("VIP-1", 10));
+        Thread t2 = new Thread(new TicketBooking("VIP-2", 9));
+        Thread t3 = new Thread(new TicketBooking("User-1", 5));
+        Thread t4 = new Thread(new TicketBooking("User-2", 4));
+
+        t1.setPriority(10);
+        t2.setPriority(9);
+        t3.setPriority(5);
+        t4.setPriority(4);
+
+        t1.start();
+        t2.start();
+        t3.start();
+        t4.start();
+    }
+}
